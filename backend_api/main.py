@@ -1,3 +1,6 @@
+import resource
+import sys
+
 import yt_dlp
 import argparse
 from shorten import shorten_video
