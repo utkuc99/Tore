@@ -2,6 +2,7 @@ from moviepy.editor import *
 from pyAudioAnalysis import audioBasicIO as aIO
 from pyAudioAnalysis import audioSegmentation as aS
 import time
+import os.path
 
 
 def shorten_video(videoCode):
@@ -14,12 +15,13 @@ def shorten_video(videoCode):
 
     # Extract Audio
     clip = VideoFileClip(videoCode + ".mp4")
-    clip.audio.write_audiofile(videoCode + ".wav")
+    if not os.path.isfile(videoCode + ".wav"):
+        clip.audio.write_audiofile(videoCode + ".wav")
 
     try:
         segments = []
         [Fs, x] = aIO.read_audio_file(videoCode + ".wav")
-        segments = aS.silence_removal(x, Fs, 0.020, 0.020, smooth_window=1.0, weight=0.1, plot=True)
+        segments = aS.silence_removal(x, Fs, 0.020, 0.020, smooth_window=1.0, weight=0.1, plot=False)
         print("Segments with voice : " + str(segments))
     except ValueError:
         pass
