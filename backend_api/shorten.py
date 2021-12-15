@@ -19,11 +19,13 @@ def shorten_video(videoCode):
         clip.audio.write_audiofile(videoCode + ".wav")
 
     try:
+        print("trying audio analysis")
         segments = []
         [Fs, x] = aIO.read_audio_file(videoCode + ".wav")
         segments = aS.silence_removal(x, Fs, 0.020, 0.020, smooth_window=1.0, weight=0.1, plot=False)
         print("Segments with voice : " + str(segments))
     except ValueError:
+        print("failed")
         pass
 
     segments2 = []
