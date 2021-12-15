@@ -1,5 +1,5 @@
 import yt_dlp
-
+import argparse
 from shorten import shorten_video
 
 
@@ -29,6 +29,13 @@ def download_video_srt(videoCode):
 
 
 if __name__ == '__main__':
-    videoCode = "1L6WHxYLacM"
+
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("videoCode", help="give youtube video code")
+    args = parser.parse_args()
+    print(args.videoCode)
+
+    videoCode = args.videoCode
     download_video_srt(videoCode)
     shorten_video(videoCode)
