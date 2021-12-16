@@ -1,3 +1,12 @@
 moviepy==1.0.3
 pyAudioAnalysis==0.3.8
 yt_dlp==2021.12.1
+eyed3==0.9.6
+imageio==2.10.4
+matplotlib==3.4.3
+nltk==3.6.5
+numpy==1.21.4
+Pillow==8.4.0
+plotly==5.3.1
+sklearn==0.0
+sumy==0.9.0     
