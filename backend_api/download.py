@@ -7,8 +7,8 @@ def download_video(videoCode):
     ydl_opts = {
         'format': '18',
         'outtmpl': videoCode + '.%(ext)s',
-        'subtitlesformat': 'srt',
-        'writeautomaticsub': True,
+        #'subtitlesformat': 'srt',
+        #'writeautomaticsub': True,
         #'subtitleslangs': ['en'],
     }
 

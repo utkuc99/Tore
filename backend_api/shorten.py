@@ -53,7 +53,7 @@ def shorten_video(videoCode):
 
 
     edited_video = concatenate_videoclips(keep_clips)
-    edited_video.write_videofile(videoCode + "_short.mp4",
+    edited_video.write_videofile("processed_videos/" + videoCode + "_short.mp4",
                                  preset='ultrafast',
                                  codec='libx264',
                                  temp_audiofile='temp-audio.mp3',
