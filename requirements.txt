@@ -1,17 +1,17 @@
 eyed3==0.9.6
 Flask==2.0.2
 Flask-RESTful==0.3.9
-hmmlearn==0.2.6
+hmmlearn==0.2.7
 imageio==2.10.4
 imageio-ffmpeg==0.4.5
-matplotlib==3.4.3
+matplotlib==3.5.2
 moviepy==1.0.3
 nltk==3.6.5
 numpy==1.22.3
 Pillow==8.4.0
 pyAudioAnalysis==0.3.8
 requests==2.26.0
-scikit-learn==1.0.1
+scikit-learn==1.1.0
 scipy==1.8.0
 sklearn==0.0
 plotly==5.3.1
@@ -23,3 +23,5 @@ pyopenssl==21.0.0
 google-api-python-client==2.47.0
 google-cloud==0.34.0
 google-cloud-videointelligence==2.7.0
+dvr-scan==1.4.1
+opencv-python==4.5.5.64

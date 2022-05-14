@@ -3,8 +3,6 @@ from pyAudioAnalysis import audioBasicIO as aIO
 from pyAudioAnalysis import audioSegmentation as aS
 import time
 import os
-import sys
-from google.cloud import videointelligence_v1 as videointelligencepip
 import subprocess
 from datetime import datetime, timedelta
 
@@ -68,10 +66,12 @@ def shorten_video(videoCode):
     print("trying motion analysis")
     process = subprocess.run("dvr-scan -i " + videoCode + ".mp4 -t 5 -so", stdout=subprocess.PIPE, shell=True)
     output = str(process.stdout)
-    x = output.split("values:\\n")[1].split("\\n\'")[0]
+    # For windows: \\r\\n For MacOS: \\n and \\n\'
+    x = output.partition("values:\\r\\n")[2].split("\\r\\n")[0]
+    print(x)
     size = len(x)
     y = x.split(",")
-    #print(y)
+
     print("done motion analysis")
 
     # Calculate segments without motion
@@ -89,18 +89,36 @@ def shorten_video(videoCode):
         x = x + 2
     print("Segments with motion: " + str(segmentsWithMotion))
 
-    #Combine Arrays --Work in Progress
-    scoreArray = {}
-    for i in range(len(clip)):
+
+    #Combine Arrays
+    scoreArray = []
+    for i in range(int(clip.duration)):
         secondScore = 0
         secondScore += checkArray(segmentsWithAudio, i)
         secondScore += checkArray(segmentsWithMotion, i)
-        scoreArray[i] = secondScore
+        scoreArray.append(secondScore)
+    print("Score Array:" + str(scoreArray))
 
+    finalArray = []
+    activeSegm = False
+    segment = []
+    for i in range(len(scoreArray)):
+        if activeSegm:
+            if scoreArray[i] != 2:
+                segment.append(i-1)
+                finalArray.append(segment)
+                segment = []
+                activeSegm = False
+        else:
+            if(scoreArray[i] == 2):
+                segment.append(i)
+                activeSegm = True
+
+    print("Final segments: " + str(finalArray))
 
 
     #Generate new video
-    keep_clips = [clip.subclip(start, end) for [start, end] in segmentsWithAudio]
+    keep_clips = [clip.subclip(start, end) for [start, end] in finalArray]
     edited_video = concatenate_videoclips(keep_clips)
     edited_video.write_videofile("processed_videos/" + videoCode + "_short.mp4",
                                  preset='ultrafast',
@@ -110,29 +128,6 @@ def shorten_video(videoCode):
                                  threads=6
                                  )
 
-    """
-    #Print segments without voice
-    otherSegments = []
-    for i in range(0, len(segments2) - 1):
-        segment = []
-        segment.append(segments2[i][1])
-        segment.append(segments2[i + 1][0])
-        otherSegments.append(segment);
-
-    print("Segments without voice : " + str(otherSegments))
-
-    remove_clips = [clip.subclip(start, end) for [start, end] in otherSegments]
-
-    edited_video2 = concatenate_videoclips(remove_clips)
-    edited_video2.write_videofile(videoCode + "_removed.mp4",
-                                 preset='ultrafast',
-                                 codec='libx264',
-                                 temp_audiofile='temp-audio.m4a',
-                                 remove_temp=True,
-                                 audio_codec="aac",
-                                 threads=6
-                                 )
-    """
     #Close original File
     clip.close()
 
@@ -143,7 +138,7 @@ def shorten_video(videoCode):
     print("Duration:", seconds2 - seconds)
 
     #Remove unnecesary files
-    os.remove(videoCode + ".mp4")
+    #os.remove(videoCode + ".mp4")
     os.remove(videoCode + ".wav")
 
     #Return final video
