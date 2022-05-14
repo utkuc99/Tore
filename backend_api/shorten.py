@@ -6,17 +6,18 @@ import os
 
 def shorten_video(videoCode):
 
+    #Take note the start time
     seconds = time.time()
     local_time = time.ctime(seconds)
     print()
     print("Start time:", local_time)
-
 
     # Extract Audio
     clip = VideoFileClip(videoCode + ".mp4")
     if not os.path.isfile(videoCode + ".wav"):
         clip.audio.write_audiofile(videoCode + ".wav")
 
+    #Try audio analysis
     try:
         print("trying audio analysis")
         segments = []
@@ -26,8 +27,9 @@ def shorten_video(videoCode):
     except ValueError:
         print("failed")
         pass
-
     print("done audio analysis")
+
+    #Calculate segments with audio
     segments2 = []
     changed = False;
     for i in range(0, len(segments) - 1):
@@ -46,12 +48,10 @@ def shorten_video(videoCode):
                 changed = False
         else:
             changed = False
-
     print("Segments with voice : " + str(segments2))
 
+    #Generate new video
     keep_clips = [clip.subclip(start, end) for [start, end] in segments2]
-
-
     edited_video = concatenate_videoclips(keep_clips)
     edited_video.write_videofile("processed_videos/" + videoCode + "_short.mp4",
                                  preset='ultrafast',
@@ -62,7 +62,7 @@ def shorten_video(videoCode):
                                  )
 
     """
-
+    #Print segments without voice
     otherSegments = []
     for i in range(0, len(segments2) - 1):
         segment = []
@@ -84,15 +84,18 @@ def shorten_video(videoCode):
                                  threads=6
                                  )
     """
+    #Close original File
     clip.close()
 
+    #Calculate run time
     seconds2 = time.time()
     local_time = time.ctime(seconds)
     print("End time:", local_time)
     print("Duration:", seconds2 - seconds)
 
+    #Remove unnecesary files
     os.remove(videoCode + ".mp4")
     os.remove(videoCode + ".wav")
 
-
+    #Return final video
     return videoCode + "_short.mp4"
