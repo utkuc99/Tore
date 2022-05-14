@@ -3,6 +3,20 @@ from pyAudioAnalysis import audioBasicIO as aIO
 from pyAudioAnalysis import audioSegmentation as aS
 import time
 import os
+import sys
+from google.cloud import videointelligence_v1 as videointelligencepip
+import subprocess
+from datetime import datetime, timedelta
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'bitirme-345011-8ff740d30042.json'
+
+
+def checkArray(segments, second):
+    for i in segments:
+        if(i[0] < second and i[1] > second):
+            return 1
+    return 0
+
 
 def shorten_video(videoCode):
 
@@ -30,7 +44,7 @@ def shorten_video(videoCode):
     print("done audio analysis")
 
     #Calculate segments with audio
-    segments2 = []
+    segmentsWithAudio = []
     changed = False;
     for i in range(0, len(segments) - 1):
         if (changed == False):
@@ -38,20 +52,55 @@ def shorten_video(videoCode):
                 segment = []
                 segment.append(segments[i][0])
                 segment.append(segments[i + 1][1])
-                segments2.append(segment);
+                segmentsWithAudio.append(segment);
                 changed = True
             else:
                 segment = []
                 segment.append(segments[i][0])
                 segment.append(segments[i][1])
-                segments2.append(segment);
+                segmentsWithAudio.append(segment);
                 changed = False
         else:
             changed = False
-    print("Segments with voice : " + str(segments2))
+    print("Segments with audio: " + str(segmentsWithAudio))
+
+    # motion scan
+    print("trying motion analysis")
+    process = subprocess.run("dvr-scan -i " + videoCode + ".mp4 -t 5 -so", stdout=subprocess.PIPE, shell=True)
+    output = str(process.stdout)
+    x = output.split("values:\\n")[1].split("\\n\'")[0]
+    size = len(x)
+    y = x.split(",")
+    #print(y)
+    print("done motion analysis")
+
+    # Calculate segments without motion
+    array = []
+    for i in range(0, len(y)):
+        time2 = datetime.strptime(y[i], '%H:%M:%S.%f')
+        a_timedelta = time2 - datetime(1900, 1, 1)
+        seconds = a_timedelta.total_seconds()
+        array.append(seconds)
+
+    segmentsWithMotion = []
+    x = 0
+    while x < len(array) - 1:
+        segmentsWithMotion.append([array[x], array[x + 1]])
+        x = x + 2
+    print("Segments with motion: " + str(segmentsWithMotion))
+
+    #Combine Arrays --Work in Progress
+    scoreArray = {}
+    for i in range(len(clip)):
+        secondScore = 0
+        secondScore += checkArray(segmentsWithAudio, i)
+        secondScore += checkArray(segmentsWithMotion, i)
+        scoreArray[i] = secondScore
+
+
 
     #Generate new video
-    keep_clips = [clip.subclip(start, end) for [start, end] in segments2]
+    keep_clips = [clip.subclip(start, end) for [start, end] in segmentsWithAudio]
     edited_video = concatenate_videoclips(keep_clips)
     edited_video.write_videofile("processed_videos/" + videoCode + "_short.mp4",
                                  preset='ultrafast',

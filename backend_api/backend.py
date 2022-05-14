@@ -1,6 +1,5 @@
 from flask import Flask, request
 from flask_restful import Resource, Api
-
 import os
 
 from shorten import shorten_video
