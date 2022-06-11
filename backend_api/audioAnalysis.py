@@ -10,6 +10,8 @@ def audio_analysis(videoCode):
     clip = VideoFileClip(videoCode + ".mp4")
     if not os.path.isfile(videoCode + ".wav"):
         clip.audio.write_audiofile(videoCode + ".wav")
+    if not os.path.isfile(videoCode + ".mp3"):
+        clip.audio.write_audiofile(videoCode + ".mp3")
 
     try:
         print("trying audio analysis")

@@ -62,7 +62,7 @@ def shorten_video(videoCode):
     # Generate new video
     keep_clips = [clip.subclip(start, end) for [start, end] in finalArray]
     edited_video = concatenate_videoclips(keep_clips)
-    edited_video.write_videofile("processed_videos/" + videoCode + "_short.mp4",
+    edited_video.write_videofile("frontend/client/public/" + videoCode + "_short.mp4",
                                  preset='ultrafast',
                                  codec='libx264',
                                  temp_audiofile='temp-audio.mp3',
@@ -80,7 +80,7 @@ def shorten_video(videoCode):
     print("Duration:", seconds2 - seconds)
 
     # Remove unnecesary files
-    #os.remove(videoCode + ".mp4")
+    os.remove(videoCode + ".mp4")
     os.remove(videoCode + ".wav")
 
     return videoCode + "_short.mp4"

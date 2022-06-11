@@ -4,12 +4,12 @@ import os
 import io
 from google.cloud import videointelligence_v1 as videointelligence
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'backend_api/bitirme-345011-8ff740d30042.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'backend_api/hopeful-ally-350713-ae076300eb06.json'
 
 
 def subtitle_analysis(videoCode):
 
-    path = videoCode + ".mp4"
+    path = videoCode + ".mp3"
     with io.open(path, "rb") as movie:
         input_content = movie.read()
 
@@ -31,7 +31,7 @@ def subtitle_analysis(videoCode):
 
     print("\nProcessing video for speech transcription.")
 
-    result = operation.result(timeout=600)
+    result = operation.result(timeout=1800)
 
     # There is only one annotation_result since only
     # one video is processed.
